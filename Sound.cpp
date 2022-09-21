@@ -34,7 +34,7 @@ Sound::Ramp< float > Sound::volume = Sound::Ramp< float >(1.0f);
 Sound::Listener Sound::listener;
 
 //This audio-mixing callback is defined below:
-void mix_audio(void *, Uint8 *buffer_, int len);
+void mix_audio(void *, Uint8 *buffer_, int len); // run in different thread than switching music 
 
 //------------------------ public-facing --------------------------------
 
@@ -311,7 +311,7 @@ void step_direction_ramp(Sound::Ramp< glm::vec3 > &ramp) {
 
 
 //The audio callback -- invoked by SDL when it needs more sound to play:
-void mix_audio(void *, Uint8 *buffer_, int len) {
+void mix_audio(void *, Uint8 *buffer_, int len) { // mipmap works on audio?
 	assert(buffer_); //should always have some audio buffer
 
 	struct LR {

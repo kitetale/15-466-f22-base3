@@ -72,7 +72,7 @@ struct PlayingSample {
 	bool stopping = false; //is playing stopping?
 	bool stopped = false; //was playback stopped (either by running out of sample, or by stop())?
 
-	Ramp< float > volume = Ramp< float >(1.0f);
+	Ramp< float > volume = Ramp< float >(1.0f); //btwn 0 1
 
 	//2D playback panning control: ('NaN' if sound played in 3D mode)
 	Ramp< float > pan = Ramp< float >(std::numeric_limits< float >::quiet_NaN());
@@ -131,7 +131,9 @@ struct Listener {
 	Ramp< glm::vec3 > position = Ramp< glm::vec3 >(0.0f); //listener's location
 	Ramp< glm::vec3 > right = Ramp< glm::vec3 >(1.0f, 0.0f, 0.0f); //unit vector pointing to listener's right
 };
-extern struct Listener listener;
+extern struct Listener listener; // extern: I'll tell u it exists but will only find during the game (x in current object file)
+//sound API is locating for you and user is not locating this 
+// sound listener is rendering where the sound output is --> and only need one listener, so managed by listener lib
 
 //"panic button" to shut off all currently playing sounds:
 void stop_all_samples();
