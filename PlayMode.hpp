@@ -36,15 +36,38 @@ struct PlayMode : Mode {
 	// glm::quat upper_leg_base_rotation;
 	// glm::quat lower_leg_base_rotation;
 	float wobble = 0.0f;
-	Scene::Transform *pad1 = nullptr;
-	glm::quat pad1_rotation;
 
-	glm::vec3 get_leg_tip_position();
+	Scene::Transform *pad1 = nullptr;
+	Scene::Transform *pad2 = nullptr;
+	Scene::Transform *pad3 = nullptr;
+	Scene::Transform *pad4 = nullptr;
+	Scene::Transform *pad5 = nullptr;
+	Scene::Transform *pad6 = nullptr;
+	Scene::Transform *pad7 = nullptr;
+	Scene::Transform *reverse = nullptr;
+	
+	glm::quat pad1_rotation;
+	glm::quat pad2_rotation;
+	glm::quat pad3_rotation;
+	glm::quat pad4_rotation;
+	glm::quat pad5_rotation;
+	glm::quat pad6_rotation;
+	glm::quat pad7_rotation;
+	glm::quat reverse_rotation;
+
+	// glm::vec3 get_leg_tip_position();
 
 	//music coming from the tip of the leg (as a demonstration):
 	std::shared_ptr< Sound::PlayingSample > leg_tip_loop;
 
 	std::shared_ptr< Sound::PlayingSample > sound1_loop;
+	std::shared_ptr< Sound::PlayingSample > sound1;
+	std::shared_ptr< Sound::PlayingSample > sound2;
+	std::shared_ptr< Sound::PlayingSample > sound3;
+	std::shared_ptr< Sound::PlayingSample > sound4;
+	std::shared_ptr< Sound::PlayingSample > sound5;
+	std::shared_ptr< Sound::PlayingSample > sound6;
+	std::shared_ptr< Sound::PlayingSample > sound7;
 
 	
 	//camera:

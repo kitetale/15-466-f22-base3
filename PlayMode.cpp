@@ -43,6 +43,24 @@ Load< Scene > hitpad_scene(LoadTagDefault, []() -> Scene const * {
 Load< Sound::Sample > sound1_sample(LoadTagDefault, []() -> Sound::Sample const * {
 	return new Sound::Sample(data_path("sound1.wav"));
 });
+Load< Sound::Sample > sound2_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("sound2.wav"));
+});
+Load< Sound::Sample > sound3_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("sound3.wav"));
+});
+Load< Sound::Sample > sound4_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("sound4.wav"));
+});
+Load< Sound::Sample > sound5_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("sound5.wav"));
+});
+Load< Sound::Sample > sound6_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("sound6.wav"));
+});
+Load< Sound::Sample > sound7_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("sound7.wav"));
+});
 
 PlayMode::PlayMode() : scene(*hitpad_scene) {
 	//get pointers to leg for convenience:
@@ -57,8 +75,22 @@ PlayMode::PlayMode() : scene(*hitpad_scene) {
 
 	for (auto &transform : scene.transforms) {
 		if (transform.name == "pad.1") pad1 = &transform;
+		if (transform.name == "pad.2") pad2 = &transform;
+		if (transform.name == "pad.3") pad3 = &transform;
+		if (transform.name == "pad.4") pad4 = &transform;
+		if (transform.name == "pad.5") pad5 = &transform;
+		if (transform.name == "pad.6") pad6 = &transform;
+		if (transform.name == "pad.7") pad7 = &transform;
+		if (transform.name == "Torus") reverse = &transform;
 	}
 	pad1_rotation = pad1->rotation;
+	pad2_rotation = pad2->rotation;
+	pad3_rotation = pad3->rotation;
+	pad4_rotation = pad4->rotation;
+	pad5_rotation = pad5->rotation;
+	pad6_rotation = pad6->rotation;
+	pad7_rotation = pad7->rotation;
+	reverse_rotation = reverse->rotation;
 
 	// hip_base_rotation = hip->rotation;
 	// upper_leg_base_rotation = upper_leg->rotation;
@@ -73,6 +105,7 @@ PlayMode::PlayMode() : scene(*hitpad_scene) {
 	// leg_tip_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, get_leg_tip_position(), 10.0f);
 	
 	sound1_loop = Sound::loop_3D(*sound1_sample, 1.0f, pad1->position, 10.0f);
+	sound1 = Sound::play(*sound1_sample, 1.0f);
 
 }
 
