@@ -104,8 +104,8 @@ PlayMode::PlayMode() : scene(*hitpad_scene) {
 	// (note: position will be over-ridden in update())
 	// leg_tip_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, get_leg_tip_position(), 10.0f);
 	
-	sound1_loop = Sound::loop_3D(*sound1_sample, 1.0f, pad1->position, 10.0f);
-	sound1 = Sound::play(*sound1_sample, 1.0f);
+	// sound1_loop = Sound::loop_3D(*sound1_sample, 1.0f, pad1->position, 10.0f);
+	// sound1 = Sound::play(*sound1_sample, 1.0f);
 
 }
 
@@ -113,40 +113,70 @@ PlayMode::~PlayMode() {
 }
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
+// e s x g m k i 
+// blue,red,green,center,purple,yellow,navy
 
 	if (evt.type == SDL_KEYDOWN) {
 		if (evt.key.keysym.sym == SDLK_ESCAPE) {
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 			return true;
-		} else if (evt.key.keysym.sym == SDLK_a) {
-			left.downs += 1;
-			left.pressed = true;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_d) {
-			right.downs += 1;
-			right.pressed = true;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_w) {
-			up.downs += 1;
-			up.pressed = true;
+		} else if (evt.key.keysym.sym == SDLK_e) {
+			blue.downs += 1;
+			blue.pressed = true;
+			Sound::play(*sound1_sample, 1.0f);
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_s) {
-			down.downs += 1;
-			down.pressed = true;
+			red.downs += 1;
+			red.pressed = true;
+			Sound::play(*sound2_sample, 1.0f);
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_x) {
+			green.downs += 1;
+			green.pressed = true;
+			Sound::play(*sound3_sample, 1.0f);
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_m) {
+			purple.downs += 1;
+			purple.pressed = true;
+			Sound::play(*sound4_sample, 1.0f);
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_k) {
+			yellow.downs += 1;
+			yellow.pressed = true;
+			Sound::play(*sound5_sample, 1.0f);
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_i) {
+			navy.downs += 1;
+			navy.pressed = true;
+			Sound::play(*sound6_sample, 1.0f);
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_g) {
+			center.downs += 1;
+			center.pressed = true;
+			Sound::play(*sound7_sample, 1.0f);
 			return true;
 		}
 	} else if (evt.type == SDL_KEYUP) {
-		if (evt.key.keysym.sym == SDLK_a) {
-			left.pressed = false;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_d) {
-			right.pressed = false;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_w) {
-			up.pressed = false;
+		if (evt.key.keysym.sym == SDLK_e) {
+			blue.pressed = false;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_s) {
-			down.pressed = false;
+			red.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_x) {
+			green.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_m) {
+			purple.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_k) {
+			yellow.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_i) {
+			navy.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_g) {
+			center.pressed = false;
 			return true;
 		}
 	} else if (evt.type == SDL_MOUSEBUTTONDOWN) {
@@ -195,26 +225,26 @@ void PlayMode::update(float elapsed) {
 	// leg_tip_loop->set_position(get_leg_tip_position(), 1.0f / 60.0f);
 
 	//move camera:
-	{
+	// {
 
-		//combine inputs into a move:
-		constexpr float PlayerSpeed = 30.0f;
-		glm::vec2 move = glm::vec2(0.0f);
-		if (left.pressed && !right.pressed) move.x =-1.0f;
-		if (!left.pressed && right.pressed) move.x = 1.0f;
-		if (down.pressed && !up.pressed) move.y =-1.0f;
-		if (!down.pressed && up.pressed) move.y = 1.0f;
+	// 	//combine inputs into a move:
+	// 	constexpr float PlayerSpeed = 30.0f;
+	// 	glm::vec2 move = glm::vec2(0.0f);
+	// 	if (left.pressed && !right.pressed) move.x =-1.0f;
+	// 	if (!left.pressed && right.pressed) move.x = 1.0f;
+	// 	if (down.pressed && !up.pressed) move.y =-1.0f;
+	// 	if (!down.pressed && up.pressed) move.y = 1.0f;
 
-		//make it so that moving diagonally doesn't go faster:
-		if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
+	// 	//make it so that moving diagonally doesn't go faster:
+	// 	if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
 
-		glm::mat4x3 frame = camera->transform->make_local_to_parent();
-		glm::vec3 frame_right = frame[0];
-		//glm::vec3 up = frame[1];
-		glm::vec3 frame_forward = -frame[2];
+	// 	glm::mat4x3 frame = camera->transform->make_local_to_parent();
+	// 	glm::vec3 frame_right = frame[0];
+	// 	//glm::vec3 up = frame[1];
+	// 	glm::vec3 frame_forward = -frame[2];
 
-		camera->transform->position += move.x * frame_right + move.y * frame_forward;
-	}
+	// 	camera->transform->position += move.x * frame_right + move.y * frame_forward;
+	// }
 
 	{ //update listener to camera position:
 		glm::mat4x3 frame = camera->transform->make_local_to_parent();
@@ -224,10 +254,13 @@ void PlayMode::update(float elapsed) {
 	}
 
 	//reset button press counters:
-	left.downs = 0;
-	right.downs = 0;
-	up.downs = 0;
-	down.downs = 0;
+	blue.downs = 0;
+	red.downs = 0;
+	green.downs = 0;
+	purple.downs = 0;
+	yellow.downs = 0;
+	navy.downs = 0;
+	center.downs = 0;
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
