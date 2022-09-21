@@ -36,8 +36,12 @@ Load< Scene > hitpad_scene(LoadTagDefault, []() -> Scene const * {
 	});
 });
 
-Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample const * {
-	return new Sound::Sample(data_path("dusty-floor.opus"));
+// Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample const * {
+// 	return new Sound::Sample(data_path("dusty-floor.opus"));
+// });
+
+Load< Sound::Sample > sound1_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("sound1.wav"));
 });
 
 PlayMode::PlayMode() : scene(*hitpad_scene) {
@@ -51,6 +55,11 @@ PlayMode::PlayMode() : scene(*hitpad_scene) {
 	// if (upper_leg == nullptr) throw std::runtime_error("Upper leg not found.");
 	// if (lower_leg == nullptr) throw std::runtime_error("Lower leg not found.");
 
+	for (auto &transform : scene.transforms) {
+		if (transform.name == "pad.1") pad1 = &transform;
+	}
+	pad1_rotation = pad1->rotation;
+
 	// hip_base_rotation = hip->rotation;
 	// upper_leg_base_rotation = upper_leg->rotation;
 	// lower_leg_base_rotation = lower_leg->rotation;
@@ -62,6 +71,9 @@ PlayMode::PlayMode() : scene(*hitpad_scene) {
 	//start music loop playing:
 	// (note: position will be over-ridden in update())
 	// leg_tip_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, get_leg_tip_position(), 10.0f);
+	
+	sound1_loop = Sound::loop_3D(*sound1_sample, 1.0f, pad1->position, 10.0f);
+
 }
 
 PlayMode::~PlayMode() {
@@ -230,7 +242,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	GL_ERRORS();
 }
 
-glm::vec3 PlayMode::get_leg_tip_position() {
-	//the vertex position here was read from the model in blender:
-	return lower_leg->make_local_to_world() * glm::vec4(-1.26137f, -11.861f, 0.0f, 1.0f);
-}
+// glm::vec3 PlayMode::get_leg_tip_position() {
+// 	//the vertex position here was read from the model in blender:
+// 	return lower_leg->make_local_to_world() * glm::vec4(-1.26137f, -11.861f, 0.0f, 1.0f);
+// }
