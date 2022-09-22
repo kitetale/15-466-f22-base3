@@ -226,7 +226,7 @@ void PlayMode::addPad() {
 	answer.push_back(next);
 }
 
-void PlayMode::playAnswer(uint16_t n) {
+void PlayMode::playAnswer(int n) {
 	std::cout<<n<<", ";
 	switch(n) {
 		case 1 :

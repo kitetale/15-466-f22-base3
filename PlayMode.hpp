@@ -70,7 +70,7 @@ struct PlayMode : Mode {
 	std::vector<int> player_enter;
 
 	void addPad(); // generate a random number from 1-7 and add to answer vector
-	void playAnswer(uint16_t); // plays what's in answer vector
+	void playAnswer(int); // plays what's in answer vector
 
 	void hitPad1();
 	void hitPad2();
