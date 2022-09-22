@@ -233,6 +233,7 @@ void PlayMode::addPad() {
 }
 
 void PlayMode::playAnswer(uint16_t n) {
+	std::cout<<n<<", ";
 	switch(n) {
 		case 1 :
 			hitPad1();
@@ -291,6 +292,7 @@ void PlayMode::checkAnswer() {
 }
 
 void PlayMode::update(float elapsed) {
+	if (!game) return;
 	{ //return position of pads if they're not in position
 		if (pad7->position.z < 0.6) { //e
 			pad7->position.z += 0.1;
@@ -351,7 +353,6 @@ void PlayMode::update(float elapsed) {
 		player_enter.clear();
 		pressCount = 0;
 		// debug purpose print what's being played
-		std::cout<<"[ ";
 		playAnswer(answer[index]);
 		++index;
 		if (index==answer.size()) {
@@ -394,15 +395,47 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		));
 
 		constexpr float H = 0.09f;
-		lines.draw_text("Play in the order shown!",
-			glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+		lines.draw_text("Play in the order shown! (e s x g m k i)",
+			glm::vec3(-aspect + 0.4f * H, 0.85 + 0.3f * H, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
-		float ofs = 2.0f / drawable_size.y;
-		lines.draw_text("Play in the order shown!",
-			glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + + 0.1f * H + ofs, 0.0),
+		lines.draw_text("Play in the order shown! (e s x g m k i)",
+			glm::vec3(-aspect + 0.4f * H, 0.85 + 0.3f * H, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
-			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+			glm::u8vec4(0xff, 0xff, 0xff, 0xff));
+
+		
+		lines.draw_text("Score: "+std::to_string(score),
+			glm::vec3(aspect-4.5f*H, 0.85 + 0.3f * H, 0.0),
+			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
+		lines.draw_text("Score: "+std::to_string(score),
+			glm::vec3(aspect-4.5f*H, 0.85 + 0.3f * H, 0.0),
+			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+			glm::u8vec4(0xff, 0xff, 0xff, 0xff));
+
+
+		if (health == 3) {
+			lines.draw_text("3 tries left",
+				glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		} else if (health == 2) {
+			lines.draw_text("2 tries left",
+				glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		} else if (health == 1) {
+			lines.draw_text("1 try left",
+				glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		} else {
+			lines.draw_text("Game Over",
+				glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		}
 	}
 	GL_ERRORS();
 }
