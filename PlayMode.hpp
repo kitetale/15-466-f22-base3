@@ -28,15 +28,6 @@ struct PlayMode : Mode {
 	//local copy of the game scene (so code can change it during gameplay):
 	Scene scene;
 
-	//hexapod leg to wobble:
-	// Scene::Transform *hip = nullptr;
-	// Scene::Transform *upper_leg = nullptr;
-	// Scene::Transform *lower_leg = nullptr;
-	// glm::quat hip_base_rotation;
-	// glm::quat upper_leg_base_rotation;
-	// glm::quat lower_leg_base_rotation;
-	float wobble = 0.0f;
-
 	Scene::Transform *pad1 = nullptr;
 	Scene::Transform *pad2 = nullptr;
 	Scene::Transform *pad3 = nullptr;
@@ -46,21 +37,16 @@ struct PlayMode : Mode {
 	Scene::Transform *pad7 = nullptr;
 	Scene::Transform *reverse = nullptr;
 	
-	glm::quat pad1_rotation;
-	glm::quat pad2_rotation;
-	glm::quat pad3_rotation;
-	glm::quat pad4_rotation;
-	glm::quat pad5_rotation;
-	glm::quat pad6_rotation;
-	glm::quat pad7_rotation;
-	glm::quat reverse_rotation;
+	glm::quat pad1_position;
+	glm::quat pad2_position;
+	glm::quat pad3_position;
+	glm::quat pad4_position;
+	glm::quat pad5_position;
+	glm::quat pad6_position;
+	glm::quat pad7_position;
+	glm::quat reverse_position;
 
-	// glm::vec3 get_leg_tip_position();
 
-	//music coming from the tip of the leg (as a demonstration):
-	std::shared_ptr< Sound::PlayingSample > leg_tip_loop;
-
-	std::shared_ptr< Sound::PlayingSample > sound1_loop;
 	std::shared_ptr< Sound::PlayingSample > sound1;
 	std::shared_ptr< Sound::PlayingSample > sound2;
 	std::shared_ptr< Sound::PlayingSample > sound3;
@@ -73,4 +59,36 @@ struct PlayMode : Mode {
 	//camera:
 	Scene::Camera *camera = nullptr;
 
+	// player score
+	uint32_t score = 0;
+	// player health
+	uint8_t health = 3;
+
+	// list of correct generated pad orders (Absolute truth)
+	std::vector<int> answer;
+	// Player's guess per round
+	std::vector<int> player_enter;
+
+	void addPad(); // generate a random number from 1-7 and add to answer vector
+	void playAnswer(); // plays what's in answer vector
+
+	void hitPad1();
+	void hitPad2();
+	void hitPad3();
+	void hitPad4();
+	void hitPad5();
+	void hitPad6();
+	void hitPad7();
+
+	void checkAnswer();
+
+	// game ongoing
+	bool game = true;
+	// answer playing
+	bool demo = false;
+	// mutex to play one note at a time 
+	bool mutex = false;
+
+	uint16_t answerCount = 0;
+	uint16_t pressCount = 0;
 };

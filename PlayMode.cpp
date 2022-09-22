@@ -12,6 +12,13 @@
 
 #include <random>
 
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
+// load mesh 
 GLuint hitpad_meshes_for_lit_color_texture_program = 0;
 Load< MeshBuffer > hitpad_meshes(LoadTagDefault, []() -> MeshBuffer const * {
 	MeshBuffer const *ret = new MeshBuffer(data_path("hitpad.pnct"));
@@ -36,10 +43,7 @@ Load< Scene > hitpad_scene(LoadTagDefault, []() -> Scene const * {
 	});
 });
 
-// Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample const * {
-// 	return new Sound::Sample(data_path("dusty-floor.opus"));
-// });
-
+// load sounds 
 Load< Sound::Sample > sound1_sample(LoadTagDefault, []() -> Sound::Sample const * {
 	return new Sound::Sample(data_path("sound1.wav"));
 });
@@ -83,118 +87,114 @@ PlayMode::PlayMode() : scene(*hitpad_scene) {
 		if (transform.name == "pad.7") pad7 = &transform;
 		if (transform.name == "Torus") reverse = &transform;
 	}
-	pad1_rotation = pad1->rotation;
-	pad2_rotation = pad2->rotation;
-	pad3_rotation = pad3->rotation;
-	pad4_rotation = pad4->rotation;
-	pad5_rotation = pad5->rotation;
-	pad6_rotation = pad6->rotation;
-	pad7_rotation = pad7->rotation;
-	reverse_rotation = reverse->rotation;
-
-	// hip_base_rotation = hip->rotation;
-	// upper_leg_base_rotation = upper_leg->rotation;
-	// lower_leg_base_rotation = lower_leg->rotation;
+	pad1_position = pad1->position;
+	pad2_position = pad2->position;
+	pad3_position = pad3->position;
+	pad4_position = pad4->position;
+	pad5_position = pad5->position;
+	pad6_position = pad6->position;
+	pad7_position = pad7->position;
+	reverse_position = reverse->position;
 
 	//get pointer to camera for convenience:
 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
 
-	//start music loop playing:
-	// (note: position will be over-ridden in update())
-	// leg_tip_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, get_leg_tip_position(), 10.0f);
-	
-	// sound1_loop = Sound::loop_3D(*sound1_sample, 1.0f, pad1->position, 10.0f);
-	// sound1 = Sound::play(*sound1_sample, 1.0f);
-
+	//game starts
+	game = true;
+	demo = false;
+	addPad();
 }
 
 PlayMode::~PlayMode() {
 }
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
-// e s x g m k i 
-// blue,red,green,center,purple,yellow,navy
+	if (!game) return false;
+	if (demo) return true;
+
+	// e s x g m k i 
+	// blue,red,green,center,purple,yellow,navy
 
 	if (evt.type == SDL_KEYDOWN) {
-		if (evt.key.keysym.sym == SDLK_ESCAPE) {
-			SDL_SetRelativeMouseMode(SDL_FALSE);
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_e) {
+		if (evt.key.keysym.sym == SDLK_e) {
 			blue.downs += 1;
 			blue.pressed = true;
-			Sound::play(*sound1_sample, 1.0f);
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_s) {
 			red.downs += 1;
 			red.pressed = true;
-			Sound::play(*sound2_sample, 1.0f);
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_x) {
 			green.downs += 1;
 			green.pressed = true;
-			Sound::play(*sound3_sample, 1.0f);
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_m) {
 			purple.downs += 1;
 			purple.pressed = true;
-			Sound::play(*sound4_sample, 1.0f);
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_k) {
 			yellow.downs += 1;
 			yellow.pressed = true;
-			Sound::play(*sound5_sample, 1.0f);
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_i) {
 			navy.downs += 1;
 			navy.pressed = true;
-			Sound::play(*sound6_sample, 1.0f);
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_g) {
 			center.downs += 1;
 			center.pressed = true;
-			Sound::play(*sound7_sample, 1.0f);
 			return true;
 		}
 	} else if (evt.type == SDL_KEYUP) {
 		if (evt.key.keysym.sym == SDLK_e) {
+			hitPad1();
+			player_enter.push_back(1);
+			++pressCount;
 			blue.pressed = false;
+			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_s) {
+			hitPad2();
+			player_enter.push_back(2);
+			++pressCount;
 			red.pressed = false;
+			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_x) {
+			hitPad3();
+			player_enter.push_back(3);
+			++pressCount;
 			green.pressed = false;
+			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_m) {
+			hitPad4();
+			player_enter.push_back(4);
+			++pressCount;
 			purple.pressed = false;
+			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_k) {
+			hitPad5();
+			player_enter.push_back(5);
+			++pressCount;
 			yellow.pressed = false;
+			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_i) {
+			hitPad6();
+			player_enter.push_back(6);
+			++pressCount;
 			navy.pressed = false;
+			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_g) {
+			hitPad7();
+			player_enter.push_back(7);
+			++pressCount;
 			center.pressed = false;
-			return true;
-		}
-	} else if (evt.type == SDL_MOUSEBUTTONDOWN) {
-		if (SDL_GetRelativeMouseMode() == SDL_FALSE) {
-			SDL_SetRelativeMouseMode(SDL_TRUE);
-			return true;
-		}
-	} else if (evt.type == SDL_MOUSEMOTION) {
-		if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
-			glm::vec2 motion = glm::vec2(
-				evt.motion.xrel / float(window_size.y),
-				-evt.motion.yrel / float(window_size.y)
-			);
-			camera->transform->rotation = glm::normalize(
-				camera->transform->rotation
-				* glm::angleAxis(-motion.x * camera->fovy, glm::vec3(0.0f, 1.0f, 0.0f))
-				* glm::angleAxis(motion.y * camera->fovy, glm::vec3(1.0f, 0.0f, 0.0f))
-			);
+			checkAnswer();
 			return true;
 		}
 	}
@@ -202,55 +202,147 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 	return false;
 }
 
+void PlayMode::hitPad1(){
+	Sound::play(*sound1_sample, 1.0f);
+	pad7->position.z -= 1;
+}
+void PlayMode::hitPad2(){
+	Sound::play(*sound2_sample, 1.0f);
+	pad1->position.z -= 1;
+}
+void PlayMode::hitPad3(){
+	Sound::play(*sound3_sample, 1.0f);
+	pad2->position.z -= 1;
+}
+void PlayMode::hitPad4(){
+	Sound::play(*sound4_sample, 1.0f);
+	pad3->position.z -= 1;
+}
+void PlayMode::hitPad5(){
+	Sound::play(*sound5_sample, 1.0f);
+	pad4->position.z -= 1;
+}
+void PlayMode::hitPad6(){
+	Sound::play(*sound6_sample, 1.0f);
+	pad5->position.z -= 1;
+}
+void PlayMode::hitPad7(){
+	Sound::play(*sound7_sample, 1.0f);
+	pad6->position.z -= 1;
+}
+
+void PlayMode::addPad() {
+	demo = true;
+	++answerCount;
+	int next = rand() % 7 + 1; //pick number btwn 1-7
+	std::cout<<"next : "<<next<<std::endl;
+	answer.push_back(next);
+	playAnswer();
+}
+
+void PlayMode::playAnswer() {
+	// reset player enter info
+	player_enter.clear();
+	pressCount = 0;
+	// debug purpose print what's being played
+	std::cout<<"[ ";
+	for (int n : answer) {
+		while(mutex){}; // busy waiting but can't think of other way to make it play one at a time
+		std::cout<< n << ", ";
+
+		// lock it
+		mutex = true;
+		switch(n) {
+			case 1 :
+				hitPad1();
+				mutex = false;
+				break;
+			case 2 :
+				hitPad2();
+				mutex = false;
+				break;
+			case 3 :
+				hitPad3();
+				mutex = false;
+				break;
+			case 4 :
+				hitPad4();
+				mutex = false;
+				break;
+			case 5 :
+				hitPad5();
+				mutex = false;
+				break;
+			case 6 :
+				hitPad6();
+				mutex = false;
+				break;
+			case 7 :
+				hitPad7();
+				mutex = false;
+				break;
+			default :
+				std::cout << "\n number "<< n <<" not in 1-7?!??"<<std::endl;
+				break;
+		}
+	}
+	std::cout<<" ]"<<std::endl;
+
+	demo = false;
+}
+
+void PlayMode::checkAnswer() {
+	std::cout<<answerCount<< " | "<<pressCount<<std::endl;
+	if (answerCount > pressCount) return;
+	if (answerCount == pressCount){
+		int i = 0;
+		for (int n : player_enter) {
+			std::cout<<"player: [ "<<n<<", ";
+			if (n != answer[i]) {
+				std::cout<<"\n n:"<<n<<" answer:"<<answer[i]<<std::endl;
+				--health;
+				if (health <= 0) {
+					std::cout << " GAME OVER! "<<std::endl;
+					game = false;
+				}
+				// show answer again
+				playAnswer();
+				return;
+			}
+			++i;
+		}
+		std::cout<<"]"<<std::endl;
+		++score;
+		std::cout<< " Correct! "<< std::endl;
+		addPad();
+		return;
+		
+	}
+}
+
 void PlayMode::update(float elapsed) {
-
-	//slowly rotates through [0,1):
-	wobble += elapsed / 10.0f;
-	wobble -= std::floor(wobble);
-
-	// hip->rotation = hip_base_rotation * glm::angleAxis(
-	// 	glm::radians(5.0f * std::sin(wobble * 2.0f * float(M_PI))),
-	// 	glm::vec3(0.0f, 1.0f, 0.0f)
-	// );
-	// upper_leg->rotation = upper_leg_base_rotation * glm::angleAxis(
-	// 	glm::radians(7.0f * std::sin(wobble * 2.0f * 2.0f * float(M_PI))),
-	// 	glm::vec3(0.0f, 0.0f, 1.0f)
-	// );
-	// lower_leg->rotation = lower_leg_base_rotation * glm::angleAxis(
-	// 	glm::radians(10.0f * std::sin(wobble * 3.0f * 2.0f * float(M_PI))),
-	// 	glm::vec3(0.0f, 0.0f, 1.0f)
-	// );
-
-	//move sound to follow leg tip position:
-	// leg_tip_loop->set_position(get_leg_tip_position(), 1.0f / 60.0f);
-
-	//move camera:
-	// {
-
-	// 	//combine inputs into a move:
-	// 	constexpr float PlayerSpeed = 30.0f;
-	// 	glm::vec2 move = glm::vec2(0.0f);
-	// 	if (left.pressed && !right.pressed) move.x =-1.0f;
-	// 	if (!left.pressed && right.pressed) move.x = 1.0f;
-	// 	if (down.pressed && !up.pressed) move.y =-1.0f;
-	// 	if (!down.pressed && up.pressed) move.y = 1.0f;
-
-	// 	//make it so that moving diagonally doesn't go faster:
-	// 	if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
-
-	// 	glm::mat4x3 frame = camera->transform->make_local_to_parent();
-	// 	glm::vec3 frame_right = frame[0];
-	// 	//glm::vec3 up = frame[1];
-	// 	glm::vec3 frame_forward = -frame[2];
-
-	// 	camera->transform->position += move.x * frame_right + move.y * frame_forward;
-	// }
-
-	{ //update listener to camera position:
-		glm::mat4x3 frame = camera->transform->make_local_to_parent();
-		glm::vec3 frame_right = frame[0];
-		glm::vec3 frame_at = frame[3];
-		Sound::listener.set_position_right(frame_at, frame_right, 1.0f / 60.0f);
+	{ //return position of pads if they're not in position
+		if (pad7->position.z < 0.6) { //e
+			pad7->position.z += 0.1;
+		}
+		if (pad1->position.z < -0.8) { //s
+			pad1->position.z += 0.1;
+		}
+		if (pad2->position.z < -1) { //x
+			pad2->position.z += 0.1;
+		}
+		if (pad3->position.z < -1) { //m
+			pad3->position.z += 0.1;
+		}
+		if (pad4->position.z < -0.8) { //k
+			pad4->position.z += 0.1;
+		}
+		if (pad5->position.z < 0.6) { //i
+			pad5->position.z += 0.1;
+		}
+		if (pad6->position.z < 0.6) { //g
+			pad6->position.z += 0.1;
+		}
 	}
 
 	//reset button press counters:
@@ -295,20 +387,15 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		));
 
 		constexpr float H = 0.09f;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
+		lines.draw_text("Play in the order shown!",
 			glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 		float ofs = 2.0f / drawable_size.y;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
+		lines.draw_text("Play in the order shown!",
 			glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + + 0.1f * H + ofs, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
 	}
 	GL_ERRORS();
 }
-
-// glm::vec3 PlayMode::get_leg_tip_position() {
-// 	//the vertex position here was read from the model in blender:
-// 	return lower_leg->make_local_to_world() * glm::vec4(-1.26137f, -11.861f, 0.0f, 1.0f);
-// }
