@@ -12,12 +12,6 @@
 
 #include <random>
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
-#endif
-
 // load mesh 
 GLuint hitpad_meshes_for_lit_color_texture_program = 0;
 Load< MeshBuffer > hitpad_meshes(LoadTagDefault, []() -> MeshBuffer const * {
