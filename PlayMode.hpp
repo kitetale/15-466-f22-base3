@@ -90,5 +90,5 @@ struct PlayMode : Mode {
 	uint16_t answerCount = 0;
 	uint16_t pressCount = 0;
 
-	uint16_t index = 0; //indexing through answer vector in update
+	int index = 0; //indexing through answer vector in update
 };
