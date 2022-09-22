@@ -152,49 +152,42 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			player_enter.push_back(1);
 			++pressCount;
 			blue.pressed = false;
-			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_s) {
 			hitPad2();
 			player_enter.push_back(2);
 			++pressCount;
 			red.pressed = false;
-			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_x) {
 			hitPad3();
 			player_enter.push_back(3);
 			++pressCount;
 			green.pressed = false;
-			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_m) {
 			hitPad4();
 			player_enter.push_back(4);
 			++pressCount;
 			purple.pressed = false;
-			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_k) {
 			hitPad5();
 			player_enter.push_back(5);
 			++pressCount;
 			yellow.pressed = false;
-			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_i) {
 			hitPad6();
 			player_enter.push_back(6);
 			++pressCount;
 			navy.pressed = false;
-			checkAnswer();
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_g) {
 			hitPad7();
 			player_enter.push_back(7);
 			++pressCount;
 			center.pressed = false;
-			checkAnswer();
 			return true;
 		}
 	}
@@ -203,31 +196,31 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 }
 
 void PlayMode::hitPad1(){
-	Sound::play(*sound1_sample, 1.0f);
+	sound1 = Sound::play(*sound1_sample, 1.0f);
 	pad7->position.z -= 1;
 }
 void PlayMode::hitPad2(){
-	Sound::play(*sound2_sample, 1.0f);
+	sound2 = Sound::play(*sound2_sample, 1.0f);
 	pad1->position.z -= 1;
 }
 void PlayMode::hitPad3(){
-	Sound::play(*sound3_sample, 1.0f);
+	sound3 = Sound::play(*sound3_sample, 1.0f);
 	pad2->position.z -= 1;
 }
 void PlayMode::hitPad4(){
-	Sound::play(*sound4_sample, 1.0f);
+	sound4 = Sound::play(*sound4_sample, 1.0f);
 	pad3->position.z -= 1;
 }
 void PlayMode::hitPad5(){
-	Sound::play(*sound5_sample, 1.0f);
+	sound5 = Sound::play(*sound5_sample, 1.0f);
 	pad4->position.z -= 1;
 }
 void PlayMode::hitPad6(){
-	Sound::play(*sound6_sample, 1.0f);
+	sound6 = Sound::play(*sound6_sample, 1.0f);
 	pad5->position.z -= 1;
 }
 void PlayMode::hitPad7(){
-	Sound::play(*sound7_sample, 1.0f);
+	sound7 = Sound::play(*sound7_sample, 1.0f);
 	pad6->position.z -= 1;
 }
 
@@ -237,58 +230,35 @@ void PlayMode::addPad() {
 	int next = rand() % 7 + 1; //pick number btwn 1-7
 	std::cout<<"next : "<<next<<std::endl;
 	answer.push_back(next);
-	playAnswer();
 }
 
-void PlayMode::playAnswer() {
-	// reset player enter info
-	player_enter.clear();
-	pressCount = 0;
-	// debug purpose print what's being played
-	std::cout<<"[ ";
-	for (int n : answer) {
-		while(mutex){}; // busy waiting but can't think of other way to make it play one at a time
-		std::cout<< n << ", ";
-
-		// lock it
-		mutex = true;
-		switch(n) {
-			case 1 :
-				hitPad1();
-				mutex = false;
-				break;
-			case 2 :
-				hitPad2();
-				mutex = false;
-				break;
-			case 3 :
-				hitPad3();
-				mutex = false;
-				break;
-			case 4 :
-				hitPad4();
-				mutex = false;
-				break;
-			case 5 :
-				hitPad5();
-				mutex = false;
-				break;
-			case 6 :
-				hitPad6();
-				mutex = false;
-				break;
-			case 7 :
-				hitPad7();
-				mutex = false;
-				break;
-			default :
-				std::cout << "\n number "<< n <<" not in 1-7?!??"<<std::endl;
-				break;
-		}
+void PlayMode::playAnswer(uint16_t n) {
+	switch(n) {
+		case 1 :
+			hitPad1();
+			break;
+		case 2 :
+			hitPad2();
+			break;
+		case 3 :
+			hitPad3();
+			break;
+		case 4 :
+			hitPad4();
+			break;
+		case 5 :
+			hitPad5();
+			break;
+		case 6 :
+			hitPad6();
+			break;
+		case 7 :
+			hitPad7();
+			break;
+		default :
+			std::cout << "\n number "<< n <<" not in 1-7?!??"<<std::endl;
+			break;
 	}
-	std::cout<<" ]"<<std::endl;
-
-	demo = false;
 }
 
 void PlayMode::checkAnswer() {
@@ -296,8 +266,9 @@ void PlayMode::checkAnswer() {
 	if (answerCount > pressCount) return;
 	if (answerCount == pressCount){
 		int i = 0;
+		std::cout<<"player: [ ";
 		for (int n : player_enter) {
-			std::cout<<"player: [ "<<n<<", ";
+			std::cout<<n<<", ";
 			if (n != answer[i]) {
 				std::cout<<"\n n:"<<n<<" answer:"<<answer[i]<<std::endl;
 				--health;
@@ -305,8 +276,7 @@ void PlayMode::checkAnswer() {
 					std::cout << " GAME OVER! "<<std::endl;
 					game = false;
 				}
-				// show answer again
-				playAnswer();
+				demo = true;
 				return;
 			}
 			++i;
@@ -353,6 +323,43 @@ void PlayMode::update(float elapsed) {
 	yellow.downs = 0;
 	navy.downs = 0;
 	center.downs = 0;
+
+	//check answer
+	// doing here because tried to make it not run every frame so checked when only key's pressed
+	// but then that made entire notes to be played all at once 
+	if (pressCount == answerCount &&
+		(!sound1 || sound1->stopped) &&
+		(!sound2 || sound2->stopped) &&
+		(!sound3 || sound3->stopped) &&
+		(!sound4 || sound4->stopped) &&
+		(!sound5 || sound5->stopped) &&
+		(!sound6 || sound6->stopped) &&
+		(!sound7 || sound7->stopped)) {
+		checkAnswer();
+	}
+
+	//play demo
+	if (demo &&
+		(!sound1 || sound1->stopped) &&
+		(!sound2 || sound2->stopped) &&
+		(!sound3 || sound3->stopped) &&
+		(!sound4 || sound4->stopped) &&
+		(!sound5 || sound5->stopped) &&
+		(!sound6 || sound6->stopped) &&
+		(!sound7 || sound7->stopped)) {
+		// reset player enter info
+		player_enter.clear();
+		pressCount = 0;
+		// debug purpose print what's being played
+		std::cout<<"[ ";
+		playAnswer(answer[index]);
+		++index;
+		if (index==answer.size()) {
+			std::cout<<" ]"<<std::endl;
+			demo = false;
+			index = 0;
+		}
+	}
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
