@@ -288,26 +288,26 @@ void PlayMode::checkAnswer() {
 void PlayMode::update(float elapsed) {
 	if (!game) return;
 	{ //return position of pads if they're not in position
-		if (pad7->position.z < 0.6) { //e
-			pad7->position.z += 0.1;
+		if (pad7->position.z < 0.6f) { //e
+			pad7->position.z += 0.1f;
 		}
-		if (pad1->position.z < -0.8) { //s
-			pad1->position.z += 0.1;
+		if (pad1->position.z < -0.8f) { //s
+			pad1->position.z += 0.1f;
 		}
-		if (pad2->position.z < -1) { //x
-			pad2->position.z += 0.1;
+		if (pad2->position.z < -1.0f) { //x
+			pad2->position.z += 0.1f;
 		}
-		if (pad3->position.z < -1) { //m
-			pad3->position.z += 0.1;
+		if (pad3->position.z < -1.0f) { //m
+			pad3->position.z += 0.1f;
 		}
-		if (pad4->position.z < -0.8) { //k
-			pad4->position.z += 0.1;
+		if (pad4->position.z < -0.8f) { //k
+			pad4->position.z += 0.1f;
 		}
-		if (pad5->position.z < 0.6) { //i
-			pad5->position.z += 0.1;
+		if (pad5->position.z < 0.6f) { //i
+			pad5->position.z += 0.1f;
 		}
-		if (pad6->position.z < 0.6) { //g
-			pad6->position.z += 0.1;
+		if (pad6->position.z < 0.6f) { //g
+			pad6->position.z += 0.1f;
 		}
 	}
 
